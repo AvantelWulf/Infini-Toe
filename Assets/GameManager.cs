@@ -25,17 +25,18 @@ public class GameManager : MonoBehaviour
     private struct MoveData
     {
         public int index;
-        public GameObject pieceObject;
+        public GameObject gamePiece;
     }
 
     private string[] board = new string[9];
     private bool isXTurn = true;
     private bool gameOver = false;
 
-    // Using Lists instead of Queues so index [0] stays the oldest piece when swapped
+    
     private List<MoveData> xMoves = new List<MoveData>();
     private List<MoveData> oMoves = new List<MoveData>();
 
+    //Set all initial elements on or off
     private void Start()
     {
         if (restartButton != null)
@@ -64,6 +65,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Click Detection
     private void Update()
     {
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
@@ -83,6 +85,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Main Game function
     public void HandleCellClick(int index, Vector3 spawnPosition)
     {
         if (gameOver || !string.IsNullOrEmpty(board[index])) return;
@@ -90,6 +93,7 @@ public class GameManager : MonoBehaviour
         string currentPlayer = isXTurn ? "X" : "O";
         GameObject prefabToSpawn = isXTurn ? xPrefab : oPrefab;
 
+        //Turn indicators
         if (isXTurn)
         {
             if (blueTurn != null) blueTurn.gameObject.SetActive(false);
@@ -103,21 +107,21 @@ public class GameManager : MonoBehaviour
 
         List<MoveData> currentList = isXTurn ? xMoves : oMoves;
 
-        // 1. Remove the oldest piece (always at index 0) if 3 pieces are already active
+        //Removes the oldest piece if 3 pieces are already active
         if (currentList.Count == 3)
         {
             MoveData oldestMove = currentList[0];
             board[oldestMove.index] = "";
-            Destroy(oldestMove.pieceObject);
+            Destroy(oldestMove.gamePiece);
             currentList.RemoveAt(0);
         }
 
-        // 2. Spawn the new piece and add it to the end of the list
+        // Create new piece and add it to the end of the list
         GameObject newPiece = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
         board[index] = currentPlayer;
-        currentList.Add(new MoveData { index = index, pieceObject = newPiece });
+        currentList.Add(new MoveData { index = index, gamePiece = newPiece });
 
-        // 3. Check for a win
+        //Check if a player has won
         if (CheckWin(currentPlayer))
         {
             gameOver = true;
@@ -139,10 +143,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 4. Switch turns
         isXTurn = !isXTurn;
 
-        //5. Update the visual warnings for the oldest pieces
+        //Update the oldest piece to signify it will be deleted
         UpdatePieceFades();
 
     }
@@ -164,16 +167,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Swaps between the dark and normal prefabs for oldest piece of each player
     private void SwapPiecePrefab(List<MoveData> moveList, int listIndex, GameObject newPrefab)
     {
         MoveData targetMove = moveList[listIndex];
-        Vector3 pos = targetMove.pieceObject.transform.position;
-        Destroy(targetMove.pieceObject);
+        Vector3 pos = targetMove.gamePiece.transform.position;
+        Destroy(targetMove.gamePiece);
 
         GameObject swappedPiece = Instantiate(newPrefab, pos, Quaternion.identity);
-        moveList[listIndex] = new MoveData { index = targetMove.index, pieceObject = swappedPiece };
+        moveList[listIndex] = new MoveData { index = targetMove.index, gamePiece = swappedPiece };
     }
 
+    //Checks for win condition and draws the winning line
     private bool CheckWin(string player)
     {
         int[,] winConditions = new int[,]
@@ -198,6 +203,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    //Line drawing function
     private void DrawWinLine(int startIndex, int endIndex)
     {
         if (winningLine == null || boardCells == null || boardCells.Length < 9) return;
@@ -208,6 +214,7 @@ public class GameManager : MonoBehaviour
         startPos.z = 0f;
         endPos.z = 0f;
 
+        //Extends the line past the center point of the edge pieces
         Vector3 direction = (endPos - startPos).normalized;
         startPos -= direction * lineExtend;
         endPos += direction * lineExtend;
@@ -218,10 +225,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    //Resets game to initial state and removes all pieces from the board
     public void ResetGame()
     {
-        foreach (MoveData move in xMoves) Destroy(move.pieceObject);
-        foreach (MoveData move in oMoves) Destroy(move.pieceObject);
+        foreach (MoveData move in xMoves) Destroy(move.gamePiece);
+        foreach (MoveData move in oMoves) Destroy(move.gamePiece);
 
         xMoves.Clear();
         oMoves.Clear();
