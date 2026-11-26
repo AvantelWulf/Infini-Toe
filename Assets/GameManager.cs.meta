@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5242d85ea694444f7bf4b5dc9097b9a3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - xPrefab: {fileID: 5565477300480675569, guid: 4944c59e2a36d45f28e10d4c24f0ae31, type: 3}
+  - oPrefab: {fileID: 2418668721561945, guid: 82057a13a4e5042f18d27251b395a33a, type: 3}
+  - darkXPrefab: {fileID: 3734283200211577368, guid: 288cc0e86013c45d791961edc61a2e62, type: 3}
+  - darkOPrefab: {fileID: 3479831216932417776, guid: 56d7bfb6b6abb4f89978fb4df272eaf8, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
